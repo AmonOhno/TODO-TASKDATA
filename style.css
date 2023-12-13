@@ -1,0 +1,30 @@
+/* Add some styles to a class */
+.txt-default {
+    font-weight: normal;
+    text-decoration: none;
+    color: rgb(0, 0, 255);
+}
+
+.done {
+    font-weight: normal;
+    text-decoration: line-through;
+    color: rgb(122, 122, 122);
+}
+
+.priority {
+    font-weight: normal;
+    text-decoration: none;
+    color: rgb(255, 4, 4);
+}
+
+.u-table {
+    margin-top: 12px;
+}
+
+.t-header-name {
+    padding: 4px;
+}
+
+.t-header-status {
+    padding: 4px;
+}
