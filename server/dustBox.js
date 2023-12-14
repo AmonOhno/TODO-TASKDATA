@@ -7,14 +7,14 @@ const router = Router();
 const db = dbSetup();
 
 /* データ一覧（削除済） */
-router.get('/remove-todos', async (req, res) => {
+router.get('/delete-todos', async (req, res) => {
     try {
         const query = `
         SELECT * FROM todo WHERE delete_flg = ?
       `;
-        const results = await db.promise().query(query, ['1']);
-        res.json(results[0]);
-
+        const response = await db.promise().query(query, ['1']);
+        const todos = response[0] //response[1]: Table Definition
+        res.json(todos);
     } catch (err) {
         console.log(err);
         res.json(createResponse(500, "Error getting data"))

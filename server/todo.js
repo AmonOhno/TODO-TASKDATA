@@ -1,37 +1,39 @@
+import NodeCache from 'node-cache';
 import dbSetup from './database.js';
 import { Router } from 'express';
 
 const router = Router();
-
 // データベース接続設定
 const db = dbSetup();
+
+const nodeCache = new NodeCache();
+
 /* データ一覧 */
 router.get('/todos', async (req, res) => {
-    try {
-        const query = `
-        SELECT * FROM todo WHERE delete_flg = ?
-      `;
-        const results = await db.promise().query(query, ['0']);
-        res.json(results[0]); //results[1]: Table Definition
-
-    } catch (err) {
-        console.log(err);
-        res.json(createResponse(500, "Error getting data"))
-    }
-});
-
-/* データ一覧（削除済） */
-router.get('/delete-todos', async (req, res) => {
-    try {
-        const query = `
-        SELECT * FROM todo WHERE delete_flg = ?
-      `;
-        const results = await db.promise().query(query, ['1']);
-        res.json(results[0]); //results[1]: Table Definition
-
-    } catch (err) {
-        console.log(err);
-        res.json(createResponse(500, "Error getting data"))
+    /// キャッシュキー
+    const key = 'todos';
+    /// キャッシュ取得
+    const response = nodeCache.get(key);
+    if (response) {
+        console.log("Use Cache")
+        const todos = response[0]
+        res.json(todos);
+    } else {
+        console.log("Use DB")
+        try {
+            const query = `
+            SELECT * FROM todo WHERE delete_flg = ?
+            `;
+            const response = await db.promise().query(query, ['0']);
+            // const ttl = 24 * 60 * 60;
+            const ttl = 10;
+            const todos = response[0]//response[1]: Table Definition
+            nodeCache.set(key, todos, ttl);
+            res.json(todos);
+        } catch (err) {
+            console.log(err);
+            res.json(createResponse(500, "Error getting data"))
+        }
     }
 });
 
