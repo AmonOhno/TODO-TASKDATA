@@ -1,19 +1,21 @@
-import dbSetup from './database.js';
+import { PrismaClient } from '@prisma/client';
 import { Router } from 'express';
 
 const router = Router();
 
 // データベース接続設定
-const db = dbSetup();
+const prisma = new PrismaClient()
 
 /* データ一覧（削除済） */
-router.get('/delete-todos', async (req, res) => {
+router.get('/remove-todos', async (req, res) => {
     try {
-        const query = `
-        SELECT * FROM todo WHERE delete_flg = ?
-      `;
-        const response = await db.promise().query(query, ['1']);
-        const todos = response[0] //response[1]: Table Definition
+        const todos = await prisma.todo.findMany(
+            {
+                where: {
+                    deleteFlg: "1"
+                },
+            }
+        );
         res.json(todos);
     } catch (err) {
         console.log(err);
@@ -24,13 +26,16 @@ router.get('/delete-todos', async (req, res) => {
 /* データ復元 */
 router.put('/todo/recover/:taskId', async (req, res) => {
     try {
-        // PathとBodyの情報
-        const taskId = req.params.taskId;
-
+        const taskId = Number(req.params.taskId);
         // UPDATEクエリ
-        const query = `
-            UPDATE todo SET delete_flg = 0 WHERE id = ?`;
-        await db.promise().execute(query, [taskId]);
+        await prisma.todo.update({
+            where: {
+                id: taskId
+            },
+            data: {
+                deleteFlg: "0"
+            },
+        })
         res.json(createResponse(200, "Error getting data"))
 
     } catch (err) {
@@ -43,10 +48,13 @@ router.put('/todo/recover/:taskId', async (req, res) => {
 /* データ削除（物理削除） */
 router.delete('/todo/delete/:taskId', async (req, res) => {
     try {
-        const taskId = req.params.taskId;
+        const taskId = Number(req.params.taskId);
         // DELETEクエリ
-        const query = `DELETE FROM todo WHERE id = ?`;
-        await db.promise().query(query, [taskId]);
+        await prisma.todo.delete({
+            where: {
+                id: taskId
+            },
+        })
 
         res.json(createResponse(200, "Success deleting data"))
 
