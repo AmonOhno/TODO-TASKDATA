@@ -14,9 +14,9 @@ async function init() {
         taskNameTd.textContent = data.title;
         taskNameTd.classList.add(`task-name-${data.id}`);
         // ステータスによってデザイン変更
-        if (data.status === 'priority') {
+        if (data.status === 'PRIORITY') {
             taskNameTd.classList.add(`priority`);
-        } else if (data.status === 'done') {
+        } else if (data.status === 'DONE') {
             taskNameTd.classList.add(`done`);
         }
         newTr.appendChild(taskNameTd);
@@ -160,8 +160,7 @@ async function todoEnvChangeClass(e) {
     }
     // 削除（論理削除）
     else if (isRemove(clickButtonClass)) {
-        await updateStatus(taskId, 'delete')
-        // await deleteTask(taskId)
+        await updateStatus(taskId, 'remove')
     }
 }
 
@@ -178,9 +177,9 @@ function createActionButtonsTd(buttonSelectorName, displayText, status) {
     actionButton.classList.add(buttonSelectorName);
     actionButton.textContent = displayText;
     // ボタン活性制御
-    if (isDone(buttonSelectorName) && status === 'done') {
+    if (isDone(buttonSelectorName) && status === 'DONE') {
         actionButton.disabled = true
-    } else if (isPriority(buttonSelectorName) && status === 'priority') {
+    } else if (isPriority(buttonSelectorName) && status === 'PRIORITY') {
         actionButton.disabled = true
     }
     actionButton.addEventListener("click", function () { todoEnvChangeClass(actionButton) });

@@ -78,6 +78,10 @@ async function recover(taskId) {
     @param taskId：対象のタスク
  */
 async function deleteTodo(taskId) {
+    const allowDeleted = confirm("完全に削除します。よろしいでしょうか。")
+    if (!allowDeleted) {
+        return
+    }
     const options = {
         method: "DELETE",
         headers: {
@@ -92,10 +96,10 @@ async function deleteTodo(taskId) {
             // データ最新化（リロード）
             location.reload();
         } else {
-            alert("何らかの不具合でデータ追加に失敗しました")
+            alert("何らかの不具合でデータ削除に失敗しました")
         }
     } catch (error) {
-        alert("何らかの不具合でデータ追加に失敗しました")
+        alert("何らかの不具合でデータ削除に失敗しました")
         console.error(error);
         throw error;
     }
