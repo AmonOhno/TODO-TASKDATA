@@ -10,17 +10,17 @@
         <title>TODO Application</title>
     </head>
     <body>
-        <label for="newtodo">タスク作成:</label>
-        <input type="text" id="newtodo" name="newtodo" required>
-        <input type="button" class="btn-newtodo" value="作成">
+        <h1 for="newtodo">ゴミ箱</h1>
         <table border="1" class="u-table">
             <tr>
                 <th class="t-header-name">作業内容</th>
-                <th class="t-header-status">状態</th>
+                <th class="t-header-recover">復元</th>
+                <th class="t-header-delete">完全削除</th>
             </tr>
             <div class="u_task">
             </div>
         </table>
-        <script async src="./text_job.js"></script>
+        <a href="./todo.html">戻る</a>
+        <script async src="./dustBox.js"></script>
     </body>
 </html>

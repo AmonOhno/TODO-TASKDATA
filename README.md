@@ -7,3 +7,6 @@ https://shukapin.com/infographicIT/origin-policy
 
 ### DB接続
 https://zenn.dev/joo_hashi/articles/98b32113221785
+
+### module化
+https://note.affi-sapo-sv.com/nodejs-use-import.php#title3

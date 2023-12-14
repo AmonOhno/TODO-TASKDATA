@@ -1,3 +1,42 @@
+/* 画面表示時のデータ取得 */
+async function init() {
+    const initData = await getTodo();
+    //<table>の構成取得
+    let taskTable = document.querySelector(".u-table");
+
+    for (const data of initData) {
+        //タスク行の<tr>作成
+        let newTr = document.createElement("tr");
+        newTr.classList.add(`txt-default-${data.id}`);
+
+        //タスク名の<td>作成
+        let taskNameTd = document.createElement("td");
+        taskNameTd.textContent = data.title;
+        taskNameTd.classList.add(`task-name-${data.id}`);
+        // ステータスによってデザイン変更
+        if (data.status === 'priority') {
+            taskNameTd.classList.add(`priority`);
+        } else if (data.status === 'done') {
+            taskNameTd.classList.add(`done`);
+        }
+        newTr.appendChild(taskNameTd);
+
+        // アクションの<td>作成
+        let actionTd = document.createElement("td");
+        const newbuttonDone = createActionButtonsTd(`btn-done-${data.id}`, "完了", data.status);
+        const newbuttonCurrent = createActionButtonsTd(`btn-priority-${data.id}`, "優先", data.status)
+        const newbuttonRemove = createActionButtonsTd(`btn-remove-${data.id}`, "削除", data.status)
+        actionTd.appendChild(newbuttonDone);
+        actionTd.appendChild(newbuttonCurrent);
+        actionTd.appendChild(newbuttonRemove);
+        newTr.appendChild(actionTd);
+
+        taskTable.appendChild(newTr);
+    }
+}
+
+init();
+
 /* 
  * タスク一覧取得
  */
@@ -54,88 +93,20 @@ async function updateStatus(taskId, status) {
     };
 
     try {
-        // fetchでPOSTリクエスト
-        const response = await fetch(`http://localhost:3000/todo/${taskId}`, options);
-        if (response.status === 200) {
-            // alert("ステータスを更新しました。")
-            // データ最新化（リロード）
-            location.reload();
-        } else {
-            alert("何らかの不具合でデータ追加に失敗しました")
-        }
-    } catch (error) {
-        alert("何らかの不具合でデータ追加に失敗しました")
-        console.error(error);
-        throw error;
-    }
-}
-
-/*
- * タスク削除
-    @param taskId：対象のタスク
- */
-async function deleteTask(taskId) {
-    const options = {
-        method: "DELETE",
-        headers: {
-            "Content-Type": "application/json"
-        }
-    };
-
-    try {
-        // fetchでPOSTリクエスト
+        // fetchでPUTリクエスト
         const response = await fetch(`http://localhost:3000/todo/${taskId}`, options);
         if (response.status === 200) {
             // データ最新化（リロード）
             location.reload();
         } else {
-            alert("何らかの不具合でデータ追加に失敗しました")
+            alert("何らかの不具合でデータ更新に失敗しました")
         }
     } catch (error) {
-        alert("何らかの不具合でデータ追加に失敗しました")
+        alert("何らかの不具合でデータ更新に失敗しました")
         console.error(error);
         throw error;
     }
 }
-
-/* 画面表示時のデータ取得 */
-async function init() {
-    const initData = await getTodo();
-    //<table>の構成取得
-    let taskTable = document.querySelector(".u-table");
-
-    for (const data of initData) {
-        //タスク行の<tr>作成
-        let newTr = document.createElement("tr");
-        newTr.classList.add(`txt-default-${data.id}`);
-
-        //タスク名の<td>作成
-        let taskNameTd = document.createElement("td");
-        taskNameTd.textContent = data.title;
-        taskNameTd.classList.add(`task-name-${data.id}`);
-        // ステータスによってデザイン変更
-        if (data.status === 'priority') {
-            taskNameTd.classList.add(`priority`);
-        } else if (data.status === 'done') {
-            taskNameTd.classList.add(`done`);
-        }
-        newTr.appendChild(taskNameTd);
-
-        // アクションの<td>作成
-        let actionTd = document.createElement("td");
-        const newbuttonDone = createActionButtonsTd(`btn-done-${data.id}`, "完了", data.status);
-        const newbuttonCurrent = createActionButtonsTd(`btn-priority-${data.id}`, "優先", data.status)
-        const newbuttonRemove = createActionButtonsTd(`btn-remove-${data.id}`, "削除", data.status)
-        actionTd.appendChild(newbuttonDone);
-        actionTd.appendChild(newbuttonCurrent);
-        actionTd.appendChild(newbuttonRemove);
-        newTr.appendChild(actionTd);
-
-        taskTable.appendChild(newTr);
-    }
-}
-
-init();
 
 /*
 * タスク追加
@@ -187,9 +158,10 @@ async function todoEnvChangeClass(e) {
     else if (isPriority(clickButtonClass)) {
         await updateStatus(taskId, 'priority')
     }
-    // 削除
+    // 削除（論理削除）
     else if (isRemove(clickButtonClass)) {
-        await deleteTask(taskId)
+        await updateStatus(taskId, 'delete')
+        // await deleteTask(taskId)
     }
 }
 
