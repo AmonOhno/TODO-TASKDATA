@@ -5,21 +5,22 @@ async function init() {
     let taskTable = document.querySelector(".u-table");
 
     for (const data of initData) {
-        // //タスク行の<tr>作成
+        // 行作成
         let newTr = document.createElement("tr");
         newTr.classList.add(`txt-default-${data.id}`);
 
-        // //タスク名の<td>作成
+        // タスク名ラベル
         let taskNameTd = document.createElement("td");
         taskNameTd.textContent = data.title;
         taskNameTd.classList.add(`task-name-${data.id}`);
         newTr.appendChild(taskNameTd);
 
-        // アクションの<td>作成
+        // 復元ボタン
         let recoverTd = document.createElement("td");
         const buttonRecover = createActionButtonsTd(`btn-recover-${data.id}`, "復元");
         recoverTd.appendChild(buttonRecover);
         newTr.appendChild(recoverTd);
+        // 完全削除ボタン
         let deleteTd = document.createElement("td");
         const buttonDelete = createActionButtonsTd(`btn-delete-${data.id}`, "完全削除")
         deleteTd.appendChild(buttonDelete);
@@ -76,7 +77,7 @@ async function recover(taskId) {
  * タスク削除
     @param taskId：対象のタスク
  */
-async function deleteTask(taskId) {
+async function deleteTodo(taskId) {
     const options = {
         method: "DELETE",
         headers: {
@@ -103,27 +104,22 @@ async function deleteTask(taskId) {
 /*
 タスク状態更新
 */
-// async function todoEnvChangeClass(e) {
-//     const clickButtonClass = e.classList.value;
-//     let tr = e.closest("tr");
-//     // タスクID取得
-//     const firstTd = tr.querySelector("td:first-child");
-//     const taskNameClass = firstTd.className.split(" ")[0];
-//     const taskId = taskNameClass.split("-")[taskNameClass.split("-").length - 1]
-//     // 完了
-//     if (isDone(clickButtonClass)) {
-//         await updateStatus(taskId, 'done')
-//     }
-//     // 優先
-//     else if (isPriority(clickButtonClass)) {
-//         await updateStatus(taskId, 'priority')
-//     }
-//     // 削除（論理削除）
-//     else if (isRemove(clickButtonClass)) {
-//         await updateStatus(taskId, 'delete')
-//         // await deleteTask(taskId)
-//     }
-// }
+async function todoEnvChangeClass(e) {
+    const clickButtonClass = e.classList.value;
+    let tr = e.closest("tr");
+    // タスクID取得
+    const firstTd = tr.querySelector("td:first-child");
+    const taskNameClass = firstTd.className.split(" ")[0];
+    const taskId = taskNameClass.split("-")[taskNameClass.split("-").length - 1]
+    // 復元
+    if (isRecover(clickButtonClass)) {
+        await recover(taskId)
+    }
+    // 削除（物理削除）
+    else if (isDelete(clickButtonClass)) {
+        await deleteTodo(taskId)
+    }
+}
 
 /*
     アクションボタン作成
@@ -144,17 +140,12 @@ function createActionButtonsTd(buttonSelectorName, displayText) {
 /*
  * タスクのステータス判定一覧
  */
-function isDone(className) {
-    const doneRegex = /btn-done/
-    return doneRegex.test(className)
+function isRecover(className) {
+    const recoverRegex = /btn-recover/
+    return recoverRegex.test(className)
 }
 
-function isPriority(className) {
-    const currentRegex = /btn-priority/
-    return currentRegex.test(className)
-}
-
-function isRemove(className) {
-    const removeRegex = /btn-remove/
-    return removeRegex.test(className)
+function isDelete(className) {
+    const deleteRegex = /btn-delete/
+    return deleteRegex.test(className)
 }
